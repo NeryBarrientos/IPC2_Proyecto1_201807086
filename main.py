@@ -9,22 +9,287 @@ archivo = ''
 matrizcombustible = []
 usar = LSimple()
 terrenoTrabajar = []
+posix = 0
+posiy = 0
+posfx = 0
+posfy = 0
+tamfila = 0
+tamcolumna = 0
+
+def sumaGas(combustible):
+    suma = 0
+    for gas in combustible:
+        suma += int(gas)
+    return suma
+
 def menu():
-    global archivo, matrizcombustible, terrenoTrabajar
+    global archivo, matrizcombustible, terrenoTrabajar, posix, posiy,posfx,posfy, tamfila,tamcolumna
     print("Menu principal: \n\t1.Cargar archivo \n\t2.Procesar Archivo\n\t3.Escribir archivo salida \n\t5.Generar Grafica\n\t6.Salir")
     print('--------------------------------------------------')
     lectura = input("Escoja una opcion: ")
     print('--------------------------------------------------')
-    if lectura == str(1):
+    if int(lectura) == 1:
         abrir()
-    elif lectura == str(2):
-    
-    elif lectura == str(3):
+    elif int(lectura) == 2:
+        docxml = minidom.parse(archivo)
+        terrenos = docxml.getElementsByTagName("terreno")
+        print('Lista terrenos:')
+        for terreno in terrenos:
+            print(terreno.getAttribute("nombre"))
+        lectura = input('Escoja el terreno a trabajar: ')
+        for terreno in terrenos:
+            if lectura in (terreno.getAttribute("nombre")):
+                tamfila = terreno.getElementsByTagName("n")[0].firstChild.data
+                tamcolumna = terreno.getElementsByTagName("m")[0].firstChild.data
+                posix = int(terreno.getElementsByTagName("x")[0].firstChild.data)
+                posiy = int(terreno.getElementsByTagName("y")[0].firstChild.data)
+                posfx = int(terreno.getElementsByTagName("x")[1].firstChild.data)
+                posfy = int(terreno.getElementsByTagName("y")[1].firstChild.data)
+                for element in (terreno.getElementsByTagName("posicion")):
+                    fila = element.getAttribute("x")
+                    columna = element.getAttribute("y")
+                    combustible = element.firstChild.data
+                    usar.Agregar(fila,columna,combustible)
+                #usar.printLista()
+                prueba = []
+                for i in range(int(tamfila)):
+                    prueba1 = []
+                    for j in range(int(tamcolumna)):
+                        gas = usar.getCombustible(i+1,j+1)
+                        prueba1.append(gas)
+                    prueba.append(prueba1)
+                print(prueba)
+        #temp = usar.recorrerDerecha(4,4)
+        #temp1 = usar.recorrerabajo(4,4)
+        #print(str(posix) + ',' + str(posiy) + ' ' + str(posfx) + ',' + str(posfy))
+        #print(temp1)
+        direccion = 'inicio'
+        arreglopos = []
+        arreglogas = []
+        posicionfinal = str(posfx) + ',' + str(posfy)
+        while posicionfinal not in arreglopos:
+            #-------------------------------Esquinas---------------------------------Amarillo
+            if ((int(posix)-1) == 0) and ((int(posiy)-1) ==0):
+                if direccion in 'inicio':
+                    v1 = sumaGas(usar.recorrerDerecha(posix,posiy))
+                    v2 = sumaGas(usar.recorrerabajo(posix,posiy))
+                    if v1 < v2:
+                        direccion = 'derecha'
+                        actual = str(posix) + ',' + str(posiy)
+                        arreglopos.append(actual)
+                        print(f'posiciones = {arreglopos}')
+                        arreglogas.append(usar.getCombustible(actual[0],actual[2]))
+                        print(f'gasolinas {arreglogas}')
+                        posiy += 1
+                    else:
+                        direccion = 'abajo'
+                        actual = str(posix) + ',' + str(posiy)
+                        arreglopos.append(actual)
+                        print(f'posiciones = {arreglopos}')
+                        arreglogas.append(usar.getCombustible(actual[0],actual[2]))
+                        print(f'gasolinas {arreglogas}')
+                        posix += 1
+                elif direccion in 'izquierda':
+                    v1 = sumaGas(usar.recorrerabajo(posix,posiy))
+                    direccion = 'abajo'
+                    actual = str(posix) + ',' + str(posiy)
+                    arreglopos.append(actual)
+                    print(f'posiciones = {arreglopos}')
+                    arreglogas.append(usar.getCombustible(actual[0],actual[2]))
+                    print(f'gasolinas {arreglogas}')
+                    posix += 1
+                elif direccion in 'arriba':
+                    v1 = sumaGas(usar.recorrerDerecha(posix,posiy))
+                    direccion = 'derecha'
+                    actual = str(posix) + ',' + str(posiy)
+                    arreglopos.append(actual)
+                    print(f'posiciones = {arreglopos}') 
+                    arreglogas.append(usar.getCombustible(actual[0],actual[2]))
+                    print(f'gasolinas {arreglogas}')
+                    posiy += 1
+            #elif ((int(posix)-1) ==0) and (((int(posiy)+1) > int(tamcolumna)):
+            #elif ((int(posix)+1) > int(tamfila)) and ((int(posiy)-1) ==0):
+            #elif ((int(posix)+1) > int(tamfila)) and ((int(posiy)+1) > int(tamcolumna):
+                #-------------------------------orillaesquinax---------------------------------Anaranjado
+            #elif ((int(posix)-1) == 0) and ((int(posiy)-2) == 0):
+            #elif ((int(posix)-1) == 0) and ((int(posiy)+2) > int(tamcolumna)):
+            #elif ((int(posix)+1) > int(tamfila)) and ((int(posiy)-1) == 0:
+            #elif ((int(posix)+1) > int(tamfila)) and ((int(posiy)+2) > int(tamcolumna):
+            #-------------------------------orillaesquinay---------------------------------Verde
+            elif ((int(posix)-2) == 0) and ((int(posiy)-1) == 0):
+                if direccion in 'abajo':
+                    v1 = sumaGas(usar.recorrerDerecha(posix,posiy))
+                    v2 = sumaGas(usar.recorrerabajo(posix,posiy))
+                    if v1 > v2:
+                        direccion = 'abajo'
+                        actual = str(posix) + ',' + str(posiy)
+                        arreglopos.append(actual)
+                        print(f'posiciones = {arreglopos}')
+                        arreglogas.append(usar.getCombustible(actual[0],actual[2]))
+                        print(f'gasolinas {arreglogas}')
+                        posix += 1
+                    else:
+                        direccion = 'derecha'
+                        actual = str(posix) + ',' + str(posiy)
+                        arreglopos.append(actual)
+                        print(f'posiciones = {arreglopos}')
+                        arreglogas.append(usar.getCombustible(actual[0],actual[2]))
+                        print(f'gasolinas {arreglogas}')
+                        posiy += 1
+            #elif ((int(posix)-2) == 0) and ((int(posiy)+1) > int(tamcolumna)):
+                #print(f'{posix} {posiy}')
+                #if direccion in 'derecha':
+                    #v1 = sumaGas(usar.recorrerabajo(posix,posiy))
+                    #direccion = 'abajo'
+                    #actual = str(posix) + ',' + str(posiy)
+                    #arreglopos.append(actual)
+                    #print(f'posiciones = {arreglopos}')
+                    #arreglogas.append(usar.getCombustible(actual[0],actual[2]))
+                    #print(f'gasolinas {arreglogas}')
+                    #posix += 1
+            #elif ((int(posix)+2) > int(tamfila)) and ((int(posiy)-1) == 0:
+            #elif ((int(posix)+2) > int(tamfila)) and ((int(posiy)+1) > int(tamcolumna):
+            #-------------------------------enmedioarriba---------------------------------Verdelimon
+            #elif ((int(posix)-1) == 0) and ((int(posiy)-2) >= 0) and ((int(posiy)+2) <= int(tamcolumna)):
+            #-------------------------------enmedioabajo---------------------------------amrillo cafe
+            #elif ((int(posix)+1) > int(tamfila)) and ((int(posiy)-2) >= 0) and ((int(posiy)+2) <= int(tamcolumna)):
+            #-------------------------------enmedioizquierda---------------------------------morado
+            #elif ((int(posiy)-1) == 0) and ((int(posix)-2) >= 0) and ((int(posix)+2) <= int(tamfila)):
+            #-------------------------------enmedioderecha---------------------------------moradoderecha
+            #elif ((int(posiy)+1) > int(tamcolumna)) and ((int(posix)-2) >= 0) and ((int(posix)+2) <= int(tamfila)):
+                #if direccion in 'abajo':
+                    #v1 = sumaGas(usar.recorrerIzquierda(posix,posiy))
+                    #v2 = sumaGas(usar.recorrerabajo(posix,posiy))
+                    #if v1 > v2:
+                        #direccion = 'abajo'
+                        #actual = str(posix) + ',' + str(posiy)
+                        #arreglopos.append(actual)
+                        #print(f'posiciones = {arreglopos}')
+                        #arreglogas.append(usar.getCombustible(actual[0],actual[2]))
+                        #print(f'gasolinas {arreglogas}')
+                        #posix += 1
+                    #else:
+                        #direccion = 'izquierda'
+                        #actual = str(posix) + ',' + str(posiy)
+                        #arreglopos.append(actual)
+                        #print(f'posiciones = {arreglopos}')
+                        #arreglogas.append(usar.getCombustible(actual[0],actual[2]))
+                        #print(f'gasolinas {arreglogas}')
+                        #posiy -= 1
+                #print('aca')
+                #print(direccion)
+                #-------------------------------interseccionarribIz---------------------------------gris
+            elif ((int(posix)-2) == 0) and ((int(posiy)-2) == 0):
+                if direccion in 'derecha':
+                    v1 = sumaGas(usar.recorrerDerecha(posix,posiy))
+                    v2 = sumaGas(usar.recorrerabajo(posix,posiy))
+                    if v1 > v2:
+                        direccion = 'abajo'
+                        actual = str(posix) + ',' + str(posiy)
+                        arreglopos.append(actual)
+                        print(f'posiciones = {arreglopos}')
+                        arreglogas.append(usar.getCombustible(actual[0],actual[2]))
+                        print(f'gasolinas {arreglogas}')
+                        posix += 1
+                    else:
+                        direccion = 'derecha'
+                        actual = str(posix) + ',' + str(posiy)
+                        arreglopos.append(actual)
+                        print(f'posiciones = {arreglopos}')
+                        arreglogas.append(usar.getCombustible(actual[0],actual[2]))
+                        print(f'gasolinas {arreglogas}')
+                        posiy += 1
+            #-------------------------------interseccionarribDere---------------------------------gris
+            elif ((int(posix)-2) == 0) and ((int(posiy)+2) > int(tamcolumna)):
+                if direccion in 'derecha':
+                    v1 = sumaGas(usar.recorrerDerechaAbajo(posix,posiy))
+                    v2 = sumaGas(usar.recorrerabajo(posix,posiy))
+                    v3 = sumaGas(usar.recorrerDerechaArriba(posix,posiy))
+                    if (v1 > v2) and (v3 > v2):
+                        direccion = 'abajo'
+                        actual = str(posix) + ',' + str(posiy)
+                        arreglopos.append(actual)
+                        print(f'posiciones = {arreglopos}')
+                        arreglogas.append(usar.getCombustible(actual[0],actual[2]))
+                        print(f'gasolinas {arreglogas}')
+                        posix += 1
+                    elif (v2 > v1) and (v3 > v1):
+                        direccion = 'derecha'
+                        actual = str(posix) + ',' + str(posiy)
+                        arreglopos.append(actual)
+                        print(f'posiciones = {arreglopos}')
+                        arreglogas.append(usar.getCombustible(actual[0],actual[2]))
+                        print(f'gasolinas {arreglogas}')
+                        posiy += 1
+                        exit()
+                    elif (v1 > v3) and (v2 > v3):
+                        direccion = 'derecha'
+                        actual = str(posix) + ',' + str(posiy)
+                        arreglopos.append(actual)
+                        print(f'posiciones = {arreglopos}')
+                        arreglogas.append(usar.getCombustible(actual[0],actual[2]))
+                        print(f'gasolinas {arreglogas}')
+                        posiy += 1
+            #-------------------------------interseccionabajoIz---------------------------------gris
+            #elif ((int(posix)+2) > int(tamfila)) and ((int(posiy)-2) == 0):
+            #-------------------------------interseccionabajoDere---------------------------------gris
+            #elif ((int(posix)+2) > int(tamfila)) and ((int(posiy)+2) > int(tamcolumna)):
+            #-------------------------------enmedioarribax+1---------------------------------grisoscuro
+            elif ((int(posix)-2) == 0) and ((int(posiy)-2) > 0 ) and ((int(posiy)+2) <= int(tamcolumna)):
+                if direccion in 'derecha':
+                    v1 = sumaGas(usar.recorrerDerecha(posix,posiy))
+                    v2 = sumaGas(usar.recorrerabajo(posix,posiy))
+                    if (v1 > v2):
+                        direccion = 'abajo'
+                        actual = str(posix) + ',' + str(posiy)
+                        arreglopos.append(actual)
+                        print(f'posiciones = {arreglopos}')
+                        arreglogas.append(usar.getCombustible(actual[0],actual[2]))
+                        print(f'gasolinas {arreglogas}')
+                        posix += 1
+                    else:
+                        direccion = 'derecha'
+                        actual = str(posix) + ',' + str(posiy)
+                        arreglopos.append(actual)
+                        print(f'posiciones = {arreglopos}')
+                        arreglogas.append(usar.getCombustible(actual[0],actual[2]))
+                        print(f'gasolinas {arreglogas}')
+                        posiy += 1
+            #-------------------------------enmedioabajotamfila-1---------------------------------grisoscuro
+            #elif ((int(posix)+2) > int(tamfila)) and ((int(posiy)-2) <=0 ) and ((int(posiy)-2) <= int(tamcolumna)):
+            #-------------------------------enmizqierday+1---------------------------------grisoscuro
+            #elif ((int(posiy)-2) == 0) and ((int(posix)-2) >=0 ) and ((int(posix)-2) <= int(tamfila)):
+            #-------------------------------enmedioderechatamcolumna-1---------------------------------grisoscuro
+            #elif ((int(posiy)+2) > int(tamcolumna)) and ((int(posix)-2) >=0 ) and ((int(posix)-2) <= int(tamfila)):
+            #-------------------------------centro---------------------------------azulmarino
+            #elif ((int(posiy)-2) >= 0) and ((int(posix)-2) >=0 ) and ((int(posiy)+2) <= int(tamcolumna)) and ((int(posix)+2) <= int(tamfila)):
+                #if direccion in 'derecha':
+                    #v1 = sumaGas(usar.recorrerDerecha(posix,posiy))
+                    #v2 = sumaGas(usar.recorrerabajo(posix,posiy))
+                    #if v1 > v2:
+                        #direccion = 'abajo'
+                        #actual = str(posix) + ',' + str(posiy)
+                        #arreglopos.append(actual)
+                        #print(f'posiciones = {arreglopos}')
+                        #arreglogas.append(usar.getCombustible(actual[0],actual[2]))
+                        #print(f'gasolinas {arreglogas}')
+                        #posix += 1
+                    #else:
+                        #direccion = 'derecha'
+                        #actual = str(posix) + ',' + str(posiy)
+                        #arreglopos.append(actual)
+                        #print(f'posiciones = {arreglopos}')
+                        #arreglogas.append(usar.getCombustible(actual[0],actual[2]))
+                        #print(f'gasolinas {arreglogas}')
+                        #posiy += 1
+
+            
+    elif lectura == int(3):
         c=1
-    elif lectura == str(4):
+    elif lectura == int(4):
         print('Nery José Barrientos Posadas\n201807086\nIntroducción a la computacion 2 sección "A"\nIngenieria en ciencias y sistemas\n4to semestre')
         menu()
-    elif lectura == str(5):
+    elif lectura == int(5):
         temporal = 'graph grid {\n'
         docxml = minidom.parse(archivo)
         terrenos = docxml.getElementsByTagName("terreno")
@@ -155,7 +420,7 @@ def menu():
         temporal = ''
         usar.borrar()
         menu()
-    elif lectura == str(6):
+    elif lectura == int(6):
         exit()
     else:
         print("No es una opcion valida")
@@ -174,5 +439,11 @@ def abrir():
     #leer = f.read()
     #f.close()
     menu()
+
+def recorrido(fila,columna):
+    combustible = usar.recorrerDerecha(fila,columna)
+    prueba = sumaGas(combustible)
+    print(prueba)
+
 
 menu()

@@ -1,23 +1,39 @@
 graph grid {
-label = "terreno3"
-a0 [label = "2"];
-a1 [label = "1"];
+label = "terreno1"
+a0 [label = "1"];
+a1 [label = "4"];
 a2 [label = "3"];
-a3 [label = "3"];
-a4 [label = "5"];
-a5 [label = "2"];
+a3 [label = "5"];
+a4 [label = "2"];
+a5 [label = "1"];
 a6 [label = "1"];
-a7 [label = "4"];
-a8 [label = "3"];
+a7 [label = "1"];
+a8 [label = "2"];
 a9 [label = "1"];
-a10 [label = "2"];
-a11 [label = "1"];
-a0-- a4 -- a8 
-a1-- a5 -- a9 
-a2-- a6 -- a10 
-a3-- a7 -- a11 
-rank=same{a0--a1 -- a2 -- a3 }
-rank=same{a4--a5 -- a6 -- a7 }
-rank=same{a8--a9 -- a10 -- a11 }
+a10 [label = "5"];
+a11 [label = "4"];
+a12 [label = "1"];
+a13 [label = "3"];
+a14 [label = "1"];
+a15 [label = "3"];
+a16 [label = "2"];
+a17 [label = "3"];
+a18 [label = "1"];
+a19 [label = "1"];
+a20 [label = "2"];
+a21 [label = "6"];
+a22 [label = "3"];
+a23 [label = "2"];
+a24 [label = "1"];
+a0-- a5 -- a10 -- a15 -- a20 
+a1-- a6 -- a11 -- a16 -- a21 
+a2-- a7 -- a12 -- a17 -- a22 
+a3-- a8 -- a13 -- a18 -- a23 
+a4-- a9 -- a14 -- a19 -- a24 
+rank=same{a0--a1 -- a2 -- a3 -- a4 }
+rank=same{a5--a6 -- a7 -- a8 -- a9 }
+rank=same{a10--a11 -- a12 -- a13 -- a14 }
+rank=same{a15--a16 -- a17 -- a18 -- a19 }
+rank=same{a20--a21 -- a22 -- a23 -- a24 }
 
 }
