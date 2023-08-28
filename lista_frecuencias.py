@@ -7,21 +7,38 @@ class LSimple_frecuencias(object):
         self.ultimo = None
 
     def vacio(self):
+        # Verifica si la lista está vacía
         if self.primero == None:
             return True
         else:
             return False
-    def Agregar(self,t,a,valor):
-        nuevo = cn.NodoFrecuencias(t,a,valor)
-        if self.vacio():
-            self.primero = self.ultimo = nuevo
-            self.ultimo.siguiente = self.primero
-        else:
-            self.ultimo.siguiente = nuevo
+
+    def Agregar(self, t, a, valor):
+        # Agrega un nuevo nodo a la lista de frecuencias de manera ordenada
+        nuevo = cn.NodoFrecuencias(t, a, valor)
+        
+        # Caso especial: la lista está vacía o el nuevo valor debe ir al principio
+        if self.vacio() or (t, a) < (self.primero.t, self.primero.a):
+            nuevo.siguiente = self.primero
+            self.primero = nuevo
+            if self.vacio():
+                self.ultimo = nuevo
+            return
+
+        actual = self.primero
+
+        while actual.siguiente is not None and (t, a) > (actual.siguiente.t, actual.siguiente.a):
+            actual = actual.siguiente
+
+        nuevo.siguiente = actual.siguiente
+        actual.siguiente = nuevo
+
+        # Si el nuevo valor se inserta al final, actualizamos 'ultimo'
+        if nuevo.siguiente is None:
             self.ultimo = nuevo
-            self.ultimo.siguiente = self.primero
 
     def printLista(self):
+        # Imprime los valores de la lista de frecuencias
         if self.vacio():
             print('Lista Vacia')
         else:
@@ -35,6 +52,54 @@ class LSimple_frecuencias(object):
                     validar = False
                 else:
                     aux = aux.siguiente
+
+    def convertir_a_matriz(self):
+        if self.vacio():
+            print('Lista Vacia')
+            return []
+        # Encuentra el tamaño máximo necesario para crear la matriz
+        max_t = 0
+        max_a = 0
+        aux = self.primero
+        while aux is not None:
+            if int(aux.t) > max_t:
+                max_t = int(aux.t)
+            if int(aux.a) > max_a:
+                max_a = int(aux.a)
+            aux = aux.siguiente
+
+        # Crea una matriz llena de ceros con las dimensiones necesarias
+        matriz = [[0 for _ in range(max_a + 1)] for _ in range(max_t + 1)]
+
+        # Rellena la matriz con los valores de los nodos
+        aux = self.primero
+        while aux is not None:
+            matriz[int(aux.t) - 1][int(aux.a) - 1] = int(aux.valor)
+            aux = aux.siguiente
+
+        return matriz
+
+    def encontrar_filas_iguales(self, matriz):
+        # Encuentra filas iguales en la matriz y las devuelve como pares de filas
+        filas_iguales = []
+
+        for i in range(len(matriz)):
+            for j in range(i + 1, len(matriz)):
+                if matriz[i] == matriz[j]:
+                    filas_iguales.append((i+1, j+1))
+
+        return filas_iguales
+
+    def comparar_binaria(self):
+        # Convierte la lista de frecuencias en una matriz
+        matriz = self.convertir_a_matriz()
+        # Encuentra las filas iguales en la matriz
+        iguales = self.encontrar_filas_iguales(matriz)
+        print(iguales)
+        for par in iguales:
+            print(f"Fila {par[0]} y Fila {par[1]} son iguales.")
+
     def borrar(self):
+        # Borra todos los elementos de la lista de frecuencias
         self.primero = None
         self.ultimo = None

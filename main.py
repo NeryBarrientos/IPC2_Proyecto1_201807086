@@ -4,93 +4,109 @@ import easygui as eg
 from os import system
 from lista_frecuencias import LSimple_frecuencias
 from lista_senales import LSimple_senales
+
+# Limpiar la pantalla
 system("cls")
+
+# Inicializar las listas
 Lista_frecuencias = LSimple_frecuencias()
 Lista_senales = LSimple_senales()
 
 # Función para mostrar el menú y obtener la elección del usuario
 def main_menu():
+    # Mensaje de bienvenida
     imprimir = '*********************************************'
     imprimir1 = 'Bienvenido'
     mensaje = imprimir.center(75, ' ') + '\n' + imprimir1.center(75, ' ') + '\n' + imprimir.center(75, ' ') + '\n'
     print(mensaje)
+    
+    # Menú principal
     print("Menu Principal:")
     print("\t1. Cargar archivo")
     print("\t2. Procesar archivo")
     print("\t3. Escribir archivo salida")
     print("\t4. Mostrar datos del estudiante")
     print("\t5. Generar gráfica")
-    print("\t6. Inicializar sistema")
-    print("\t7. Salida")
+    print("\t6. Salida")
     
     while True:
         try:
-            opcion = int(input("Por favor, elija una opción (1-7): "))
-            if opcion < 1 or opcion > 7:
-                print("Opción no válida. Por favor, ingrese un número del 1 al 7.")
+            opcion = int(input("Por favor, elija una opción (1-6): "))
+            if opcion < 1 or opcion > 6:
+                print("Opción no válida. Por favor, ingrese un número del 1 al 6.")
             else:
                 return opcion
         except ValueError:
-            print("Entrada no válida. Ingrese un número del 1 al 7.")
+            print("Entrada no válida. Ingrese un número del 1 al 6.")
 
+# Función para leer y procesar el archivo XML
 def leer_archivo_xml(archivo):
     try:
         tree = ET.ElementTree(ET.fromstring(archivo))
-
         root = tree.getroot()
-
+        
         # Iterar a través de las etiquetas "senal"
         for senal in root.findall('senal'):
             nombre = senal.get('nombre')
             t = senal.get('t')
             A = senal.get('A')
-
+            
             # Crear una nueva instancia de la lista de frecuencias para cada señal
             Lista_frecuencias = LSimple_frecuencias()
-
+            
             # Iterar a través de las etiquetas "dato" dentro de cada "senal"
             for dato in senal.findall('dato'):
                 t_dato = dato.get('t')
                 A_dato = dato.get('A')
                 valor = dato.text
                 
-                # Agregar el valor a la lista de frecuencias de la señal actual
+                # Agregar el valor a la lista de frecuencias de la señal actual de manera ordenada
                 Lista_frecuencias.Agregar(t_dato, A_dato, valor)
-
+            
             # Agregar la señal con su lista de frecuencias a la lista de señales
             Lista_senales.Agregar(t, A, nombre, Lista_frecuencias)
-
-        # Mostrar las señales y sus listas de frecuencias
-        Lista_senales.printLista()
-
+    
     except Exception as e:
         print(f"Error al procesar el archivo XML: {str(e)}")
 
-
+# Función para cargar un archivo XML
 def load_file():
+    # Mensaje de éxito al cargar el archivo
     imprimir = '*********************************************'
     imprimir1 = 'Archivo Cargado exitosamente'
+    
+    # Extensiones permitidas
     extension = ["*.xml"]
+    
+    # Diálogo para seleccionar un archivo
     archivo = eg.fileopenbox(msg="Abrir archivo",
                              title="Control: fileopenbox",
                              default='D:/rec nery/rec nery/Desktop/Nery José Barrientos/Segundo Semestre 2023/ipc2/IPC2_Proyecto1_201807086/*xml',
                              filetypes=extension)
-
+    
     if archivo:
         mensaje = 'Ruta del Archivo: ' + str(archivo) + '\n\n\n\n\n' + imprimir.center(
             75, ' ') + '\n' + imprimir1.center(75, ' ') + '\n' + imprimir.center(75, ' ') + '\n'
         eg.msgbox(msg=mensaje, title="Mensaje")
         try:
+            # Leer el contenido del archivo XML y procesarlo
             f = open(archivo, 'r', encoding="utf8")
             contenido = f.read()
             f.close()
             leer_archivo_xml(contenido)
         except Exception as e:
+            # Mostrar mensaje de error si ocurre un problema al leer el archivo
             eg.msgbox(msg=f"Error al leer el archivo XML: {str(e)}", title="Error", ok_button="Aceptar")
     else:
         eg.msgbox(msg="No se seleccionó un archivo.", title="Error", ok_button="Aceptar")
 
+# Función para procesar los datos
+def process_data():
+    Lista_senales.agregar_binaria()
+    # Lista_senales.imprimir_binaria()
+    Lista_senales.procesar_binaria()
 
+# Bucle principal
 while True:
     opcion = main_menu()
     
@@ -99,19 +115,13 @@ while True:
         load_file()
     elif opcion == 2:
         print("Ha elegido la opción 2: Procesar archivo")
-        # Aquí puedes agregar la lógica para procesar el archivo
+        process_data()
     elif opcion == 3:
         print("Ha elegido la opción 3: Escribir archivo salida")
-        # Aquí puedes agregar la lógica para escribir el archivo de salida
     elif opcion == 4:
         print("Ha elegido la opción 4: Mostrar datos del estudiante")
-        # Aquí puedes agregar la lógica para mostrar los datos del estudiante
     elif opcion == 5:
         print("Ha elegido la opción 5: Generar gráfica")
-        # Aquí puedes agregar la lógica para generar una gráfica
     elif opcion == 6:
-        print("Ha elegido la opción 6: Inicializar sistema")
-        # Aquí puedes agregar la lógica para inicializar el sistema
-    elif opcion == 7:
-        print("Ha elegido la opción 7: Salida")
-        break
+        print("Ha elegido la opción 6: Salida")
+        break  # Salir del bucle al elegir la opción 6
