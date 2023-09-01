@@ -8,23 +8,19 @@ class LSimple_senales(object):
         self.ultimo = None
 
     def vacio(self):
-        if self.primero == None:
-            return True
-        else:
-            return False
+        return self.primero is None  # Comprobar si la lista está vacía
 
-    # Agrega una señal a la lista de señales
-    def Agregar(self,t,a,nombre,frecuencias):
-        nuevo = cn.NodoSenales(t,a,nombre,frecuencias)
+    def Agregar(self, t, a, nombre, frecuencias):
+        # Agregar una nueva señal a la lista de señales
+        nuevo = cn.NodoSenales(t, a, nombre, frecuencias)
         if self.vacio():
             self.primero = self.ultimo = nuevo
-            self.ultimo.siguiente = self.primero
+            self.ultimo.siguiente = self.primero  # Hacer que el último nodo apunte al primero
         else:
             self.ultimo.siguiente = nuevo
             self.ultimo = nuevo
-            self.ultimo.siguiente = self.primero
+            self.ultimo.siguiente = self.primero  # Hacer que el último nodo apunte al primero
 
-    # Convierte las frecuencias de cada señal a binario (0 o 1) y actualiza la lista de señales con los valores binarios
     def agregar_binaria(self):
         if self.vacio():
             print('Lista Vacia')
@@ -33,21 +29,20 @@ class LSimple_senales(object):
             aux = self.primero
             n = 1
             while validar:
-                nueva_binaria = LSimple_frecuencias()  # Crea una nueva instancia de LSimple_frecuencias para binaria
+                nueva_binaria = LSimple_frecuencias()  # Crear una nueva instancia para señales binarias
                 actual = aux.frecuencias.primero
                 while actual is not None:
-                    # Aplica la condición: si el valor es diferente de 0, valor = 1, de lo contrario, es 0
+                    # Convierte las frecuencias a binario (0 o 1)
                     valor_modificado = 1 if int(actual.valor) != 0 else 0
                     nueva_binaria.Agregar(actual.t, actual.a, valor_modificado)
                     actual = actual.siguiente
 
-                aux.binaria = nueva_binaria  # Asigna la nueva instancia de LSimple_frecuencias a binaria
+                aux.binaria = nueva_binaria  # Asignar la nueva instancia de señales binarias
                 if aux == self.ultimo:
                     validar = False
                 else:
                     aux = aux.siguiente
 
-    # Imprime la lista de señales junto con sus valores de frecuencias
     def printLista(self):
         if self.vacio():
             print('Lista Vacia')
@@ -56,6 +51,7 @@ class LSimple_senales(object):
             aux = self.primero
             n = 1
             while validar:
+                # Imprimir información de la señal y sus frecuencias
                 print(f'Tiempo: {aux.t}  Amplitud: {aux.a}  Valor: {aux.nombre}')
                 aux.frecuencias.printLista()
                 n += 1
@@ -64,7 +60,6 @@ class LSimple_senales(object):
                 else:
                     aux = aux.siguiente
 
-    # Imprime la lista de señales junto con sus valores binarios
     def imprimir_binaria(self):
         if self.vacio():
             print('Lista Vacia')
@@ -73,6 +68,7 @@ class LSimple_senales(object):
             aux = self.primero
             n = 1
             while validar:
+                # Imprimir información de la señal y sus valores binarios
                 print(f'Tiempo: {aux.t}  Amplitud: {aux.a}  Valor: {aux.nombre}')
                 aux.binaria.printLista()
                 n += 1
@@ -81,7 +77,19 @@ class LSimple_senales(object):
                 else:
                     aux = aux.siguiente
 
-    # Procesa las señales binarias e imprime las filas que son iguales entre señales
+    def mostrar_matriz_sin_duplicados(self, matriz):
+        filas_vistas = set()
+        matriz_sin_duplicados = []
+
+        for fila in matriz:
+            fila_tupla = tuple(fila)  # Convierte la fila en una tupla para eliminar duplicados
+
+            if fila_tupla not in filas_vistas:
+                filas_vistas.add(fila_tupla)
+                matriz_sin_duplicados.append(list(fila_tupla))
+
+        return matriz_sin_duplicados
+
     def procesar_binaria(self):
         if self.vacio():
             print('Lista Vacia')
@@ -89,13 +97,42 @@ class LSimple_senales(object):
             validar = True
             aux = self.primero
             n = 1
+
             while validar:
                 print(f'Tiempo: {aux.t}  Amplitud: {aux.a}  Valor: {aux.nombre}')
-                aux.binaria.comparar_binaria()
+                print('Matriz Original')
+                matriz_original = aux.frecuencias.convertir_a_matriz()
+                for i in matriz_original:
+                    print(i)
+                lista_filas_iguales = aux.binaria.comparar_binaria()
+
+                # Crear una nueva instancia de LSimple_frecuencias para 'reducida'
+                nueva_reducida = LSimple_frecuencias()
+
+                for grupo_filas in lista_filas_iguales:
+                    # Sumar las filas correspondientes en la matriz original y agregar el resultado a la matriz resultado
+                    suma_fila = [sum(filas) for filas in zip(*(matriz_original[i] for i in grupo_filas))]
+
+                    # Convertir los índices de filas iguales a texto, por ejemplo, [0, 1, 2] a "1,2,3"
+                    valor_fila = ",".join(str(fila_idx + 1) for fila_idx in grupo_filas)
+
+                    # Agregar los valores a la instancia de nueva_reducida
+                    for col_idx, valor in enumerate(suma_fila):
+                        nueva_reducida.Agregar(valor_fila, col_idx + 1, valor)
+
+                # Copiar las filas no afectadas directamente desde la matriz original a 'nueva_reducida'
+                filas_no_afectadas = set(range(len(matriz_original))) - set(sum(lista_filas_iguales, []))
+                for fila_idx in filas_no_afectadas:
+                    for col_idx, valor in enumerate(matriz_original[fila_idx]):
+                        nueva_reducida.Agregar(str(fila_idx + 1), col_idx + 1, valor)
+
+                # Asignar 'nueva_reducida' al atributo 'reducida' del nodo actual
+                aux.reducida = nueva_reducida
+                print('Este es el resultado:')
+                nueva_reducida.printLista()
+
                 n += 1
                 if aux == self.ultimo:
                     validar = False
                 else:
                     aux = aux.siguiente
-
-                    

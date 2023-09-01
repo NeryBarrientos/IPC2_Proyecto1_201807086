@@ -5,4 +5,5 @@ class NodoSenales(object):
         self.nombre = nombre
         self.frecuencias = frecuencias
         self.binaria = None
+        self.reducida = None
         self.siguiente = None
