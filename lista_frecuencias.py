@@ -103,13 +103,28 @@ class LSimple_frecuencias(object):
     def comparar_binaria(self):
         # Convierte la lista de frecuencias en una matriz
         matriz = self.convertir_a_matriz()
-        print('Matriz Binaria')
-        print(matriz)
+        # print('Matriz Binaria')
+        # print(matriz)
         # Encuentra las filas iguales en la matriz
         iguales = self.encontrar_filas_iguales(matriz)
-        print('Filas iguales')
-        print(iguales)
+        # print('Filas iguales')
+        # print(iguales)
         return iguales
+
+    def convertir_a_lista(self):
+        lista_datos = []
+
+        actual = self.primero
+        while actual is not None:
+            dato = {
+                "tiempo": actual.t,
+                "amplitud": actual.a,
+                "valor": actual.valor
+            }
+            lista_datos.append(dato)
+            actual = actual.siguiente
+
+        return lista_datos
 
     def borrar(self):
         # Borra todos los elementos de la lista de frecuencias

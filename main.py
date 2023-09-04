@@ -27,17 +27,18 @@ def main_menu():
     print("\t3. Escribir archivo salida")
     print("\t4. Mostrar datos del estudiante")
     print("\t5. Generar gráfica")
-    print("\t6. Salida")
+    print("\t6. Inicializar Sitema")
+    print("\t7. Salida")
     
     while True:
         try:
-            opcion = int(input("Por favor, elija una opción (1-6): "))
-            if opcion < 1 or opcion > 6:
-                print("Opción no válida. Por favor, ingrese un número del 1 al 6.")
+            opcion = int(input("Por favor, elija una opción (1-7): "))
+            if opcion < 1 or opcion > 7:
+                print("Opción no válida. Por favor, ingrese un número del 1 al 7.")
             else:
                 return opcion
         except ValueError:
-            print("Entrada no válida. Ingrese un número del 1 al 6.")
+            print("Entrada no válida. Ingrese un número del 1 al 7.")
 
 # Función para leer y procesar el archivo XML
 def leer_archivo_xml(archivo):
@@ -105,6 +106,23 @@ def process_data():
     Lista_senales.agregar_binaria()
     # Lista_senales.imprimir_binaria()
     Lista_senales.procesar_binaria()
+    # Lista_senales.imprimir_reducida()
+
+def out_xml():
+    # Lista_senales.imprimir_reducida()
+    diccionario = Lista_senales.convertir_reducida_a_diccionario()
+    Lista_senales.generar_xml(diccionario)
+    # Lista_senales.generar_xml_reducida()
+
+def mostrar_datos_personales():
+    print("Datos Personales:")
+    print("\tNombre: Nery José Barrientos Posadas")
+    print("\tCarne: 201807086")
+    print("\tCurso: Lab. IPC 2")
+    print("\tSección: A")
+
+def new_system():
+    Lista_senales.borrar()
 
 # Bucle principal
 while True:
@@ -115,13 +133,28 @@ while True:
         load_file()
     elif opcion == 2:
         print("Ha elegido la opción 2: Procesar archivo")
-        process_data()
+        if Lista_senales.vacio():
+            print("No se ha cargado ningun archivo")
+        else:
+            process_data()
     elif opcion == 3:
         print("Ha elegido la opción 3: Escribir archivo salida")
+        if Lista_senales.vacio():
+            print("No se ha cargado ningun archivo")
+        else:
+            out_xml()
     elif opcion == 4:
         print("Ha elegido la opción 4: Mostrar datos del estudiante")
+        mostrar_datos_personales()
     elif opcion == 5:
         print("Ha elegido la opción 5: Generar gráfica")
+        if Lista_senales.vacio():
+            print("No se ha cargado ningun archivo")
+        else:
+            process_data()
     elif opcion == 6:
+        print("Ha elegido la opción 6: Inicializar el Sistema")
+        new_system()
+    elif opcion == 7:
         print("Ha elegido la opción 6: Salida")
         break  # Salir del bucle al elegir la opción 6
