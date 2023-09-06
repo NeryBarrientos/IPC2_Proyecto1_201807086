@@ -4,6 +4,10 @@ import easygui as eg
 from os import system
 from lista_frecuencias import LSimple_frecuencias
 from lista_senales import LSimple_senales
+import time
+import sys
+
+archivo_procesado = False
 
 # Limpiar la pantalla
 system("cls")
@@ -101,18 +105,33 @@ def load_file():
     else:
         eg.msgbox(msg="No se seleccionó un archivo.", title="Error", ok_button="Aceptar")
 
+
+def update_progress_bar(iteration, total, bar_length=50):
+    progress = iteration / total
+    arrow = '=' * int(round(bar_length * progress))
+    spaces = ' ' * (bar_length - len(arrow))
+    sys.stdout.write(f'\r[{arrow + spaces}] {int(progress * 100)}%')
+    sys.stdout.flush()
+
+def process_data_with_progress():
+    total_steps = 100
+    for i in range(total_steps + 1):
+        update_progress_bar(i, total_steps)
+        time.sleep(0.02)  # Simular 2 segundos en total
+    eg.msgbox(msg="Archivo Procesado Correctamente.", title="Procesado", ok_button="Aceptar")
+
 # Función para procesar los datos
 def process_data():
+    # Llamar a la función para procesar datos con barra de progreso
+    process_data_with_progress()
+    print()
     Lista_senales.agregar_binaria()
-    # Lista_senales.imprimir_binaria()
     Lista_senales.procesar_binaria()
-    # Lista_senales.imprimir_reducida()
+    return True
 
 def out_xml():
-    # Lista_senales.imprimir_reducida()
     diccionario = Lista_senales.convertir_reducida_a_diccionario()
     Lista_senales.generar_xml(diccionario)
-    # Lista_senales.generar_xml_reducida()
 
 def mostrar_datos_personales():
     print("Datos Personales:")
@@ -123,6 +142,22 @@ def mostrar_datos_personales():
 
 def new_system():
     Lista_senales.borrar()
+    eg.msgbox(msg="Se inicializó el Sistema", title="Inicializar", ok_button="Aceptar")
+
+def generar_grafica():
+    while True:
+        try:
+            Lista_senales.mostrar_nombres()
+            opcion = input("Por favor, elija el nombre de la señal: ")
+            if not Lista_senales.buscar_nombre(opcion):
+                print("Entrada no válida. Ingrese un nombre válido.")
+            else:
+                Lista_senales.graph_generate(opcion)
+                Lista_senales.graph_generate_reducida(opcion)
+                eg.msgbox(msg="Graficas Generadas Correctamente.", title="Graficas", ok_button="Aceptar")
+                break
+        except ValueError:
+            print("Entrada no válida. Ingrese un nombre válido.")
 
 # Bucle principal
 while True:
@@ -136,7 +171,7 @@ while True:
         if Lista_senales.vacio():
             print("No se ha cargado ningun archivo")
         else:
-            process_data()
+            archivo_procesado = process_data()
     elif opcion == 3:
         print("Ha elegido la opción 3: Escribir archivo salida")
         if Lista_senales.vacio():
@@ -148,10 +183,10 @@ while True:
         mostrar_datos_personales()
     elif opcion == 5:
         print("Ha elegido la opción 5: Generar gráfica")
-        if Lista_senales.vacio():
+        if Lista_senales.vacio() or not archivo_procesado:
             print("No se ha cargado ningun archivo")
         else:
-            process_data()
+            generar_grafica()
     elif opcion == 6:
         print("Ha elegido la opción 6: Inicializar el Sistema")
         new_system()
